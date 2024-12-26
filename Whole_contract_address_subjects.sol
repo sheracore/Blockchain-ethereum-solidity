@@ -3,6 +3,25 @@
 pragma solidity 0.8.14;
 
 contract ExampleBoolean {
+
+    string public theMessage;
+    int public changeCounter;
+    address public owner;
+
+    constructor() {
+        changeCounter = 0;
+        owner = msg.sender; // The person who deploys the contract
+    }
+
+    // All Variables are initialized by default
+    // There is no ‘null’ or ‘undefined’
+    // (u)int = 0
+    // Bool = false
+    // String = “”
+    // Every interaction on Ethereum is address-based
+    // Hold 20 byte value (An Ethereum address)
+
+
     bool public myBool;
     int public myInt;  // -2^128 to 2^128
     uint public myUint;  // 0 to (2^256 - 1)
@@ -19,16 +38,42 @@ contract ExampleBoolean {
     
     address public someAddress;
 
+    // View functions return storage variables (variables that are stored in the contract)
+    // Pure functions don’t return any storage variable, 
+    // It can only call other pure functions and work with it’s variables 
+    // they don’t need burning gas because they don't work with storage variables.
+
+    // transfering ether to contract and back again requires payable function.
+    
+    // you can send ether or wei with the Remix value section so that the ‘ether’ will lock in the smart contract, 
+    // but you can bring it out into another address.
+
+
+    function payableUpdateString(string memory _newString) public payable{
+        if (msg.value == 1 ether){
+            myString =_newString;
+        } else {
+            payable(msg.sender).transfer(msg.value);
+        }
+        
+    }
+
+
+    function updateTheMessage(string memory _newMessage) public {
+        if (msg.sender == owner){
+            theMessage = _newMessage;
+            changeCounter++;
+        }
+    }
+
+    function addTwoUint(uint a, uint b) public pure returns(uint) {
+        return a+b;
+    }
+
     //msg.sender is the address of the person(account) who is interacting with this smart contract
-
-
-
-
-
     function updateSomeAddressToSender() public {
         someAddress = msg.sender;
     }
-
 
     function setSomeAddress(address _someAddress) public{
         someAddress = _someAddress;

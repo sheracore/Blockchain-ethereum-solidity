@@ -4,6 +4,8 @@ pragma solidity 0.8.14;
 
 contract ExampleBoolean {
 
+    uint public lastValueSent;
+    string public lastFunctionCalled;
     string public theMessage;
     int public changeCounter;
     address public owner;
@@ -32,8 +34,8 @@ contract ExampleBoolean {
     string public myString = "Hello World";
 
     // Byte technically is the same as a string but strings take more bytes 
-    //because strings are represented as UTF8 so in strings sometimes a character is represented by 2 bytes and sometimes 1 byte 
-    //so you can’t compare byte variables with string ones.
+    // Because strings are represented as UTF8 so in strings sometimes a character is represented by 2 bytes and sometimes 1 byte 
+    // so you can’t compare byte variables with string ones.
     bytes public myBytes = "Hello World";
     
     address public someAddress;
@@ -47,6 +49,63 @@ contract ExampleBoolean {
     
     // you can send ether or wei with the Remix value section so that the ‘ether’ will lock in the smart contract, 
     // but you can bring it out into another address.
+
+    
+    /**
+    - Sending Ether without data (e.g., `address(this).call{value: 1 ether}("")`) triggers the `receive` function.
+    - Sending Ether with data (e.g., `address(this).call{value: 1 ether}("data")`) triggers the `fallback` function.
+    - Calling a non-existent function (e.g., `address(this).call(abi.encodeWithSignature("nonExistentFunction()"))`) triggers the `fallback` function.
+
+    1. Fallback() Function
+        The fallback function is triggered under two main conditions:
+
+        When a contract receives a call for a function that does not exist.
+        When Ether is sent to the contract without accompanying data, but no receive function is defined.
+        
+        Characteristics:
+        It must be marked as payable to accept Ether.
+        It has no name or arguments.
+        It can optionally return data.
+        Limited to minimal logic because it has a low gas stipend (2,300 gas) when invoked by plain Ether transfers.
+        
+        Use Cases:
+        Handling unexpected function calls.
+        Logging or rejecting calls with invalid data.
+        Acting as a catch-all for any non-standard interactions.
+
+    2. Receive() Function
+        The receive function is a simpler and more specific way to handle plain Ether transfers. It is called when:
+
+        Ether is sent to the contract without any data (e.g., through address.transfer() or address.send()).
+        There is no matching fallback function that is payable.
+        
+        Characteristics:
+        It must be marked as payable.
+        It does not take any arguments or return any value.
+        If this function is not defined, Ether transfers without data will fallback to the fallback function (if it is payable).
+        
+        Use Cases:
+        Accepting donations.
+        Acting as a wallet-like contract.
+        Minimal overhead for accepting Ether transfers.
+        Key Differences Between Fallback and Receive
+        Feature	Fallback Function	Receive Function
+        Purpose	Handles invalid function calls and Ether transfers (with or without data).	Handles Ether transfers without data.
+        Definition	Must use the keyword fallback.	Must use the keyword receive.
+        Data Handling	Can handle calls with or without data.	Cannot handle calls with data.
+        Optional?	Optional but recommended for robust contracts.	Optional.
+
+    */
+
+    receive() external payable {
+        lastValueSent = msg.value;
+        lastFunctionCalled = "reveive";
+    }
+
+    fallback() external payable {
+        lastValueSent = msg.value;
+        lastFunctionCalled = "fallback";
+    }
 
 
     function payableUpdateString(string memory _newString) public payable{

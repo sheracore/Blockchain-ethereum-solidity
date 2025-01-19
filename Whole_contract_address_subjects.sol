@@ -53,6 +53,7 @@ contract ExampleBoolean {
     
     /**
     - Sending Ether without data (e.g., `address(this).call{value: 1 ether}("")`) triggers the `receive` function.
+    - When Ether is sent to the contract without accompanying data, but no receive function is defined.
     - Sending Ether with data (e.g., `address(this).call{value: 1 ether}("data")`) triggers the `fallback` function.
     - Calling a non-existent function (e.g., `address(this).call(abi.encodeWithSignature("nonExistentFunction()"))`) triggers the `fallback` function.
 
@@ -96,6 +97,25 @@ contract ExampleBoolean {
         Optional?	Optional but recommended for robust contracts.	Optional.
 
     */
+
+    uint public balanceRecieved;
+
+    function deposit() public payable {
+		    balanceRecieved += msg.value;
+    }
+    
+    function getContractBalance() public view returns(uint){
+        return address(this).balance;
+    }
+
+    function withdrawAll() public {
+        address payable to = payable(msg.sender);
+        to.transfer(getContractBalance());
+    }
+
+    function withdarToAddress(address payable dst_address) public payable{
+        dst_address.transfer(getContractBalance());
+    }
 
     receive() external payable {
         lastValueSent = msg.value;

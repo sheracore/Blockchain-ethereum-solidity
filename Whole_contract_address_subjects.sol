@@ -95,10 +95,45 @@ contract ExampleBoolean {
         Definition	Must use the keyword fallback.	Must use the keyword receive.
         Data Handling	Can handle calls with or without data.	Cannot handle calls with data.
         Optional?	Optional but recommended for robust contracts.	Optional.
-
     */
 
+    /**
+    - **There are some security points in the above example**
+    - In withdrawAllMoney always should first set sender balance to zero ( 0 ) then send money, 
+       to avoid being hacked by getting money without setting balance to zero.
+    - Each account(address) has access just to it’s wallet and can’t send money more than it’s balance.
+    */
+
+
+
+
+
     uint public balanceRecieved;
+
+    mapping(uint => bool) public myMapping;
+    mapping(uint => mapping(uint => bool)) public uintUintBoolMapping;
+    mapping(address => uint) public balanceReceived;
+    mapping(address => uint) public balanceReceivedMapped;
+
+
+    function sendMoney() public payable{
+        balanceReceivedMapped[msg.sender] += msg.value;
+    }
+
+    function setMapping(uint index) public{
+        myMapping[index] = true;
+    }
+
+    function setUintUintBool(uint key1, uint key2, bool value) public{
+        uintUintBoolMapping[key1][key2] = value;
+    }
+
+    function withdrawAllMoney(address payable _to) public{
+        uint senderMoney = balanceReceivedMapped[msg.sender];
+        balanceReceivedMapped[msg.sender] = 0;
+        _to.transfer(senderMoney);
+        
+    }
 
     function deposit() public payable {
 		    balanceRecieved += msg.value;
